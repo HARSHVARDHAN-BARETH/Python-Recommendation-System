@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #productsContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .product-card:hover {
+            transform: scale(1.05);
+        }
+
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .product-card p {
+            margin: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .product-card a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .product-card a:hover {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Products</h1>
+        <div id="productsContainer"></div>
+    </div>
+
+    <script>
+        async function fetchAllProducts() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/products/');
+                const data = await response.json();
+                
+                const allProducts = data.all_products;
+
+                const productsContainer = document.getElementById('productsContainer');
+                productsContainer.innerHTML = '';
+
+                allProducts.forEach(product => {
+                    const productCard = createProductCard(product);
+                    productsContainer.innerHTML += productCard;
+                });
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        }
+
+        function createProductCard(product) {
+            return `
+                <div class="product-card">
+                    <a href='/productdetail/${product.id}/'>
+                        <img src="${product.product_image}" alt="${product.name}" />
+                        <p>${product.name}</p>
+                    </a>
+                </div>
+            `;
+        }
+
+        async function handleProductClick(productID) {
+            try {
+                Toastify({
+                    text: "You clicked this product",
+                    duration: 3000,
+                    close: true,
+                    gravity: 'bottom',
+                    position: 'right',
+                    backgroundColor: "lightBlue"
+                }).showToast();
+
+                const response = await fetch(`http://127.0.0.1:8000/activity/?product_id=${productID}`);
+                const data = await response.json();
+                console.log('API Response:', data);
+            } catch (error) {
+                console.error('Error calling activity:', error);
+            }
+        }
+
+        fetchAllProducts();
+    </script>
+</body>
+</html>
